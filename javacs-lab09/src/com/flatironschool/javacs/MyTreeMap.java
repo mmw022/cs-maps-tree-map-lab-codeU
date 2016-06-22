@@ -72,7 +72,26 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		Comparable<? super K> k = (Comparable<? super K>) target;
 		
 		// the actual search
-        // TODO: Fill this in.
+      
+      Node currentNode = root;
+
+      while( currentNode != null )
+      {
+         if( k.equals(currentNode.key) )
+         {
+            return currentNode;
+         }
+
+         if( k.compareTo( currentNode.key)  > 0 )
+         {
+            currentNode = currentNode.right;
+         }
+
+         else
+         {
+            currentNode = currentNode.left;
+         }
+      }
         return null;
 	}
 
@@ -92,7 +111,14 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 
 	@Override
 	public boolean containsValue(Object target) {
-		return false;
+      Collection<V> allValues = values();
+     
+      if( allValues.contains( target ) )
+      {
+         return true;
+      }
+
+      return false;
 	}
 
 	@Override
@@ -117,9 +143,28 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	@Override
 	public Set<K> keySet() {
 		Set<K> set = new LinkedHashSet<K>();
-        // TODO: Fill this in.
+      
+      set = inOrderTrav( set, root );
 		return set;
 	}
+
+   private Set<K> inOrderTrav( Set<K> set, Node node )
+   {
+      if( node.left != null )
+      {
+         inOrderTrav( set, node.left );
+      }
+
+      set.add( node.key );
+
+      if( node.right != null )
+      {
+         inOrderTrav( set, node.right );
+      }
+
+      return set;
+   }
+      
 
 	@Override
 	public V put(K key, V value) {
@@ -131,12 +176,53 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 			size++;
 			return null;
 		}
+
 		return putHelper(root, key, value);
 	}
 
 	private V putHelper(Node node, K key, V value) {
-        // TODO: Fill this in.
-        return null;
+      
+      Node repeat = findNode( key );
+      V oldValue = null;
+
+      if( repeat != null )
+      {
+         oldValue = repeat.value;
+         repeat.value = value;
+         return oldValue;
+      }
+
+      else
+      {
+		   Comparable<? super K> k = (Comparable<? super K>) key;
+         while( node != null )
+         {
+            if( k.compareTo( node.key ) > 0 )
+            {
+               if( node.right == null )
+               {
+                  node.right = new Node( key, value );
+                  size++;
+                  return null;
+               }
+
+               node = node.right;
+            }
+
+            else
+            {
+               if( node.left == null )
+               {
+                  node.left = new Node( key, value );
+                  size++;
+                  return null;
+               }
+
+               node = node.left;
+            }
+         }
+      }   
+      return null;
 	}
 
 	@Override
